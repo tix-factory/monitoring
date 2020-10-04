@@ -1,11 +1,10 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace TixFactory.Logging.Service.ElasticSearch
 {
-	[DataContract]
 	internal class DateBeforeRequest
 	{
-		[DataMember(Name = "@timestamp")]
+		[JsonPropertyName("@timestamp")]
 		public LessThanRange Timestamp { get; set; }
 	}
 }

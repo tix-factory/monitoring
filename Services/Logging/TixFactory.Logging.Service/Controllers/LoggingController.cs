@@ -18,5 +18,16 @@ namespace TixFactory.Logging.Service.Controllers
 		{
 			_ElasticLogger.Log(request);
 		}
+
+		[HttpDelete]
+		public void Purge(int months)
+		{
+			if (months < 1)
+			{
+				throw new ArgumentException($"{nameof(months)} must be at least 1.", nameof(months));
+			}
+
+			_ElasticLogger.Purge(DateTime.UtcNow - TimeSpan.FromDays(30 * months));
+		}
 	}
 }

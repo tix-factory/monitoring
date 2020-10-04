@@ -1,14 +1,14 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace TixFactory.Logging.Service.ElasticSearch
 {
-	[DataContract]
 	internal class LogData
 	{
-		[DataMember(Name = "name")]
+		[JsonPropertyName("name")]
 		public string Name { get; set; }
 
-		[DataMember(Name = "level")]
+		[JsonPropertyName("level")]
+		[JsonConverter(typeof(JsonStringEnumConverter))]
 		public LogLevel Level { get; set; }
 	}
 }

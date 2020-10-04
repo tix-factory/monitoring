@@ -1,12 +1,12 @@
 ﻿using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace TixFactory.Logging.Service.ElasticSearch
 {
-	[DataContract]
 	internal class RangeRequest<T>
 		where T : class
 	{
-		[DataMember(Name = "range")]
+		[JsonPropertyName("range")]
 		public T Range { get; set; }
 	}
 }

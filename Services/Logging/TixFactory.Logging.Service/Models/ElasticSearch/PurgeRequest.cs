@@ -1,12 +1,11 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace TixFactory.Logging.Service.ElasticSearch
 {
-	[DataContract]
 	internal class QueryRequest<T>
 		where T : class
 	{
-		[DataMember(Name = "query")]
+		[JsonPropertyName("query")]
 		public T Query { get; set; }
 	}
 }

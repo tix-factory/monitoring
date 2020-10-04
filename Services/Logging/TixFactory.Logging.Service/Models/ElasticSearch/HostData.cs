@@ -1,11 +1,10 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace TixFactory.Logging.Service.ElasticSearch
 {
-	[DataContract]
 	internal class HostData
 	{
-		[DataMember(Name = "name")]
+		[JsonPropertyName("name")]
 		public string Name { get; set; }
 	}
 }

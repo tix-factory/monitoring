@@ -12,7 +12,7 @@ namespace TixFactory.Logging.Service
 		static Startup()
 		{
 			var httpClient = new HttpClient();
-			_ElasticLogger = new ElasticLogger(httpClient);
+			_ElasticLogger = new ElasticLogger(httpClient, TixFactory.ApplicationContext.ApplicationContext.Singleton);
 		}
 
 		public Startup()

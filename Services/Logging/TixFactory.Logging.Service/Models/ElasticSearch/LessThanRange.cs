@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace TixFactory.Logging.Service.ElasticSearch
 {
-	[DataContract]
 	internal class LessThanRange
 	{
-		[DataMember(Name = "lte")]
+		[JsonPropertyName("lte")]
 		public DateTime LessThan { get; set; }
 	}
 }

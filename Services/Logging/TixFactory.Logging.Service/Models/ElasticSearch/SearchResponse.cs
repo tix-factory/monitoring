@@ -1,11 +1,10 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace TixFactory.Logging.Service.ElasticSearch
 {
-	[DataContract]
 	internal class SearchResponse
 	{
-		[DataMember(Name = "hits")]
+		[JsonPropertyName("hits")]
 		public SearchHits Data { get; set; }
 	}
 }

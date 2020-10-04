@@ -1,24 +1,23 @@
 ﻿using System;
-using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace TixFactory.Logging.Service.ElasticSearch
 {
-	[DataContract]
 	internal class Log
 	{
-		[DataMember(Name = "message")]
+		[JsonPropertyName("message")]
 		public string Message { get; set; }
 
-		[DataMember(Name = "log")]
+		[JsonPropertyName("log")]
 		public LogData LogData { get; set; }
 
-		[DataMember(Name = "host")]
+		[JsonPropertyName("host")]
 		public HostData HostData { get; set; }
 
-		[DataMember(Name = "labels")]
+		[JsonPropertyName("labels")]
 		public object Labels { get; } = new object();
 
-		[DataMember(Name = "@timestamp")]
+		[JsonPropertyName("@timestamp")]
 		public DateTime Created => DateTime.UtcNow;
 	}
 }

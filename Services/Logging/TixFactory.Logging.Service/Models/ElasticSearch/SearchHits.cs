@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace TixFactory.Logging.Service.ElasticSearch
 {
-	[DataContract]
 	internal class SearchHits
 	{
-		[DataMember(Name = "hits")]
+		[JsonPropertyName("hits")]
 		public IReadOnlyCollection<SearchHit> Data { get; set; }
 	}
 }

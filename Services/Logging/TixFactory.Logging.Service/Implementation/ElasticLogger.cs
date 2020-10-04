@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using TixFactory.ApplicationContext;
 using TixFactory.Http;
 using TixFactory.Http.Client;
 using TixFactory.Logging.Service.ElasticSearch;
@@ -11,12 +12,14 @@ namespace TixFactory.Logging.Service
 {
 	internal class ElasticLogger : IElasticLogger
 	{
-		private const string _UrlBase = "http://elasticsearch:9200/tix-factory/logs";
+		private const string _UrlBase = "http://tix-factory-monitoring:9200/tix-factory/logs";
 		private readonly IHttpClient _HttpClient;
+		private readonly IApplicationContext _ApplicationContext;
 
-		public ElasticLogger(IHttpClient httpClient)
+		public ElasticLogger(IHttpClient httpClient, IApplicationContext applicationContext)
 		{
 			_HttpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+			_ApplicationContext = applicationContext ?? throw new ArgumentNullException(nameof(applicationContext));
 		}
 
 		public void Log(LogRequest logRequest)
@@ -42,7 +45,8 @@ namespace TixFactory.Logging.Service
 
 			var httpRequest = new HttpRequest(HttpMethod.Put, new Uri($"{_UrlBase}/{Guid.NewGuid()}"));
 			var json = JsonSerializer.Serialize(log);
-			httpRequest.Body = new StringContent(json, Encoding.UTF8, "application/json");
+			httpRequest.Body = new StringContent(json);
+			httpRequest.Headers.AddOrUpdate("Content-Type", "application/json");
 
 			var httpResponse = _HttpClient.Send(httpRequest);
 			if (!httpResponse.IsSuccessful)
@@ -79,7 +83,23 @@ namespace TixFactory.Logging.Service
 
 			foreach (var log in searchResults.Data.Data)
 			{
-				Delete(log.Id);
+				var deleteResponse = Delete(log.Id);
+				if (!deleteResponse.IsSuccessful)
+				{
+					Log(new LogRequest
+					{
+						Message = $"{nameof(ElasticLogger)}.{nameof(Delete)}({log.Id})\n\tUrl: {deleteResponse.Url}\n\tStatus Code: {deleteResponse.StatusCode}\n{deleteResponse.GetStringBody()}",
+						Host = new HostData
+						{
+							Name = Environment.MachineName
+						},
+						Log = new LogData
+						{
+							Name = _ApplicationContext.Name,
+							Level = LogLevel.Warning
+						}
+					});
+				}
 			}
 		}
 
