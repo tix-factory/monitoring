@@ -57,20 +57,24 @@ namespace TixFactory.Logging.Service
 
 		public void Purge(DateTime clearBefore)
 		{
-			var searchRequestBody = new QueryRequest<RangeRequest<LessThanRange>>
+			var searchRequestBody = new QueryRequest<RangeRequest<DateBeforeRequest>>
 			{
-				Query = new RangeRequest<LessThanRange>
+				Query = new RangeRequest<DateBeforeRequest>
 				{
-					Range = new LessThanRange
+					Range = new DateBeforeRequest
 					{
-						LessThan = clearBefore
+						Timestamp = new LessThanRange
+						{
+							LessThan = clearBefore
+						}
 					}
 				}
 			};
 
 			var httpRequest = new HttpRequest(HttpMethod.Post, new Uri($"{_UrlBase}/_search"));
 			var json = JsonSerializer.Serialize(searchRequestBody);
-			httpRequest.Body = new StringContent(json, Encoding.UTF8, "application/json");
+			httpRequest.Body = new StringContent(json);
+			httpRequest.Headers.AddOrUpdate("Content-Type", "application/json");
 
 			var httpResponse = _HttpClient.Send(httpRequest);
 			if (!httpResponse.IsSuccessful)
