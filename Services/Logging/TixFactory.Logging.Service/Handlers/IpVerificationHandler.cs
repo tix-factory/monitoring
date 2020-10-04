@@ -68,6 +68,11 @@ namespace TixFactory.Logging.Service
 				return true;
 			}
 
+			_Logger.Verbose("Request verification failed."
+				+ $"\n\t{nameof(connection.LocalIpAddress)}: {connection.LocalIpAddress}"
+				+ $"\n\t{nameof(connection.RemoteIpAddress)}: {connection.RemoteIpAddress}"
+				+ $"\n\tPath: {request.Path}");
+
 			return false;
 		}
 
