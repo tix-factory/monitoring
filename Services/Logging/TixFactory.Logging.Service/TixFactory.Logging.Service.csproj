@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TixFactoryVersion>2.0.103</TixFactoryVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="TixFactory.Configuration" Version="$(TixFactoryVersion)" />
+    <PackageReference Include="TixFactory.Http.Client" Version="$(TixFactoryVersion)" />
+    <PackageReference Include="TixFactory.Http.Service" Version="$(TixFactoryVersion)" />
+  </ItemGroup>
+</Project>

@@ -7,11 +7,16 @@ At some point this could be expanded to time series as well.
 This README assumes you are running commands on an Ubuntu system with docker installed.
 
 ### System Configuration
+#### System Specifications
 The VPS will need at least 4GB of RAM.
 
+#### sysctl
 Add this to the `/etc/sysctl.conf` file and reboot: `vm.max_map_count=262144`
 Without this elasticsearch won't start. Updating the file makes sure it persists across reboots.
 See: https://stackoverflow.com/a/51448773/1663648
+
+#### Firewall
+TODO
 
 ### Install
 Copy the `docker-compose.yml` file into the VPS and then run it by running: `docker-compose up -d`
