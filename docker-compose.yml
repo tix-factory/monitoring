@@ -1,0 +1,22 @@
+version: "3.7"
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
+    container_name: elasticsearch
+    environment:
+      discovery.seed_hosts: 127.0.0.1
+      discovery.type: single-node
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    hostname: elasticsearch
+    restart: always
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.9.2
+    container_name: kibana
+    hostname: kibana
+    links:
+      - "elasticsearch:elasticsearch"
+    ports:
+      - "5601:5601"
+    restart: always
