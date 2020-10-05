@@ -13,8 +13,8 @@ jobs:
         dotnet-version: 3.1.x
     - name: Create Build Directories
       run: |
-        mkdir ./Build/NuGet/Cache
-        mkdir ./Build/Publish
+        mkdir -p ./Build/NuGet/Cache
+        mkdir -p ./Build/Publish
     - name: Restore
       run: dotnet restore ./Services/Logging/TixFactory.Logging.Service.sln
     - name: Build
