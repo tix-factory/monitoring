@@ -1,9 +1,6 @@
 name: TixFactory.Logging.Service
 
-on:
-  push:
-    branches:
-      - master
+on: push
 
 jobs:
   build:
@@ -14,7 +11,22 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.x
-    - name: Build Number Generator
-      uses: einaregilsson/build-number@v2
-      with:
-        token: ${{ secrets.github_token }}
+    - name: Create Build Directories
+      run: |
+        mkdir ./Build/NuGet/Cache
+        mkdir ./Build/Publish
+    - name: Restore
+      run: dotnet restore ./Services/Logging/TixFactory.Logging.Service.sln
+    - name: Build
+      run: dotnet build ./Services/Logging/TixFactory.Logging.Service.sln --configuration Release --runtime linux-x64
+    - name: Publish
+      run: dotnet publish ./Services/Logging/TixFactory.Logging.Service.csproj --self-contained true --no-build
+    outputs:
+      publish: ./Build/Publish
+  publish:
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: ${{ github.ref == 'main' }}
+    steps:
+    - name: Upload Docker Image
+      run: dir ./Build/Publish
