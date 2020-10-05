@@ -15,6 +15,7 @@ jobs:
       run: |
         mkdir -p ./Build/NuGet/Cache
         mkdir -p ./Build/Publish
+        cp ./Services/Logging/TixFactory.Logging.Service/Dockerfile ./Build/Publish/Dockerfile
     - name: Restore
       run: dotnet restore ./Services/Logging/TixFactory.Logging.Service.sln
     - name: Build + Publish
@@ -27,11 +28,14 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     needs: [build]
+    # if: ${{ github.ref == 'refs/heads/main' }}
     steps:
     - name: Download Publish Artifact
       uses: actions/download-artifact@v2
       with:
         name: artifact
-        path: ./Build/Publish 
+        path: ./Service/Artifact 
+    - name: Copy Dockerfile
+      run: cp ./Service/Artifact/Dockerfile ./Service/Dockerfile
     - name: Log Artifact Contents
-      run: dir ./Build/Publish
+      run: dir ./Service/Artifact
