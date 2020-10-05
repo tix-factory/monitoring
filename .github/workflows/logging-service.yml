@@ -17,10 +17,8 @@ jobs:
         mkdir -p ./Build/Publish
     - name: Restore
       run: dotnet restore ./Services/Logging/TixFactory.Logging.Service.sln
-    - name: Build
-      run: dotnet build ./Services/Logging/TixFactory.Logging.Service.sln --configuration Release --runtime linux-x64
-    - name: Publish
-      run: dotnet publish ./Services/Logging/TixFactory.Logging.Service/TixFactory.Logging.Service.csproj --output ./Build/Publish --configuration Release --self-contained true --no-build
+    - name: Build + Publish
+      run: dotnet publish ./Services/Logging/TixFactory.Logging.Service/TixFactory.Logging.Service.csproj --output ./Build/Publish --configuration Release --runtime linux-x64 --self-contained true
     outputs:
       publish: ./Build/Publish
   publish:
