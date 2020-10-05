@@ -20,7 +20,7 @@ jobs:
     - name: Build
       run: dotnet build ./Services/Logging/TixFactory.Logging.Service.sln --configuration Release --runtime linux-x64
     - name: Publish
-      run: dotnet publish ./Services/Logging/TixFactory.Logging.Service.csproj --self-contained true --no-build
+      run: dotnet publish ./Services/Logging/TixFactory.Logging.Service/TixFactory.Logging.Service.csproj --output ./Build/Publish --self-contained true --no-build
     outputs:
       publish: ./Build/Publish
   publish:
