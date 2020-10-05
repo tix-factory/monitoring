@@ -32,5 +32,6 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         name: artifact
+        path: ./Build/Publish 
     - name: Log Artifact Contents
       run: dir ./Build/Publish
