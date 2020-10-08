@@ -39,6 +39,7 @@ jobs:
       run: mv ./Application/Artifact/Dockerfile ./Application
     - name: Log Artifact Contents
       run: |
+        pwd
         dir ./Application
         dir ./Application/Artifact
     - name: Set up Docker Buildx
@@ -52,5 +53,5 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: true
-        file: ./Application/Dockerfile
+        file: /Application/Dockerfile
         tags: tix-factory/monitoring:latest
