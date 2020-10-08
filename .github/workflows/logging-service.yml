@@ -38,7 +38,9 @@ jobs:
     - name: Move Dockerfile
       run: mv ./Application/Artifact/Dockerfile ./Application
     - name: Log Artifact Contents
-      run: dir ./Application/Artifact
+      run: |
+        dir ./Application
+        dir ./Application/Artifact
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
     - name: Login to DockerHub
@@ -50,5 +52,5 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: true
-        file: Application/Dockerfile
+        file: ./Application/Dockerfile
         tags: tix-factory/monitoring:latest
