@@ -28,6 +28,7 @@ Kibana has a dark theme! In the navigation go to `Stack Management` -> `Advanced
 
 #### Logs
 Add the index pattern in `Stack Management` -> `Index Patterns`.
+The index is `tix-factory`.
 The logs just come directly out of elasticsearch given an index, so for logging imagine this.
 `PUT http://localhost:9200/tix-factory/logs/1`
 ```json
