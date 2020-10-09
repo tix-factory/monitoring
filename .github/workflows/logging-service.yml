@@ -15,14 +15,13 @@ jobs:
       run: |
         mkdir -p ./Build/NuGet/Cache
         mkdir -p ./Build/Publish/Application
-        mkdir -p ./Build/Publish/Image
         cp ./Services/Logging/TixFactory.Logging.Service/Dockerfile ./Build/Publish/Dockerfile
     - name: Restore
       run: dotnet restore ./Services/Logging/TixFactory.Logging.Service.sln
     - name: Build + Publish
       run: dotnet publish ./Services/Logging/TixFactory.Logging.Service/TixFactory.Logging.Service.csproj --output ./Build/Publish/Application --configuration Release --runtime linux-x64 --self-contained true
     - name: Create Docker Image
-      run: docker build ./Build/Publish --tag tix-factory/monitoring:latest --output ./Build/Publish/Image
+      run: docker build --tag tix-factory/monitoring:latest --output ./Build/Publish/Image ./Build/Publish
     - name: Create Artifact
       run: dir ./Build/Publish/Image
     #- name: Create Artifact
