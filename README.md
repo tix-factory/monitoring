@@ -16,7 +16,7 @@ Without this elasticsearch won't start. Updating the file makes sure it persists
 See: https://stackoverflow.com/a/51448773/1663648
 
 #### Firewall
-TODO
+This doc assumes ME is using digitalocean. Set up a firewall in digitalocean to allow port `80` from anywhere, and `5601` + `9200` from ME IP address.
 
 ### Install
 Copy the `docker-compose.yml` file into the VPS and then run it by running: `docker-compose up -d`
