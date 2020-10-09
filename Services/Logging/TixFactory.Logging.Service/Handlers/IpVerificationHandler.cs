@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
@@ -13,6 +14,7 @@ namespace TixFactory.Logging.Service
 		private readonly RequestDelegate _NextHandler;
 		private readonly ILogger _Logger;
 		private readonly ISet<string> _AllowedIpAddresses;
+		private readonly ISet<Regex> _RFC1918IpRegexes;
 
 		/// <summary>
 		/// Initializes a new <see cref="IpVerificationHandler"/>.
@@ -30,6 +32,15 @@ namespace TixFactory.Logging.Service
 
 			var allowedIpAddressesVariable = Environment.GetEnvironmentVariable("LoggingServiceAllowedIpAddressesCsv") ?? string.Empty;
 			_AllowedIpAddresses = new HashSet<string>(allowedIpAddressesVariable.Split(','));
+
+			// https://stackoverflow.com/a/2814102/1663648
+			_RFC1918IpRegexes = new HashSet<Regex>(new []
+			{
+				new Regex(@"^127\."),
+				new Regex(@"^10\."),
+				new Regex(@"(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)"),
+				new Regex(@"^192\.168\.")
+			});
 		}
 
 		/// <summary>
@@ -52,25 +63,23 @@ namespace TixFactory.Logging.Service
 		private bool IsRequestValid(HttpRequest request)
 		{
 			var connection = request.HttpContext.Connection;
-			_Logger.Verbose("IsRequestValid"
-			                + $"\n\t{nameof(connection.LocalIpAddress)}: {connection.LocalIpAddress}"
-			                + $"\n\t{nameof(connection.RemoteIpAddress)}: {connection.RemoteIpAddress}"
-			                + $"\n\t{nameof(connection.LocalPort)}: {connection.LocalPort}"
-			                + $"\n\t{nameof(connection.RemotePort)}: {connection.RemotePort}");
+			var remoteIpAddressString = connection.RemoteIpAddress.ToString();
+			if (connection.RemoteIpAddress.AddressFamily == AddressFamily.InterNetworkV6)
+			{
+				remoteIpAddressString = connection.RemoteIpAddress.MapToIPv4().ToString();
+			}
 
 			if (IsLocalHost(request))
 			{
-				_Logger.Verbose("Request passed based on localhost.");
 				return true;
 			}
 
-			if (connection.LocalIpAddress != null)
+			if (_AllowedIpAddresses.Contains(remoteIpAddressString))
 			{
-				// TODO: LocalIpAddress is only set when the request comes from within the network.. right?
 				return true;
 			}
 
-			if (_AllowedIpAddresses.Contains(connection.RemoteIpAddress.ToString()))
+			if (IsRfc1918Address(remoteIpAddressString))
 			{
 				return true;
 			}
@@ -78,7 +87,21 @@ namespace TixFactory.Logging.Service
 			_Logger.Verbose("Request verification failed."
 				+ $"\n\t{nameof(connection.LocalIpAddress)}: {connection.LocalIpAddress}"
 				+ $"\n\t{nameof(connection.RemoteIpAddress)}: {connection.RemoteIpAddress}"
+				+ $"\n\t{nameof(remoteIpAddressString)}: {remoteIpAddressString}"
 				+ $"\n\tPath: {request.Path}");
+
+			return false;
+		}
+
+		private bool IsRfc1918Address(string ipAddress)
+		{
+			foreach (var regex in _RFC1918IpRegexes)
+			{
+				if (regex.IsMatch(ipAddress))
+				{
+					return true;
+				}
+			}
 
 			return false;
 		}
