@@ -51,12 +51,19 @@ namespace TixFactory.Logging.Service
 
 		private bool IsRequestValid(HttpRequest request)
 		{
+			var connection = request.HttpContext.Connection;
+			_Logger.Verbose("IsRequestValid"
+			                + $"\n\t{nameof(connection.LocalIpAddress)}: {connection.LocalIpAddress}"
+			                + $"\n\t{nameof(connection.RemoteIpAddress)}: {connection.RemoteIpAddress}"
+			                + $"\n\t{nameof(connection.LocalPort)}: {connection.LocalPort}"
+			                + $"\n\t{nameof(connection.RemotePort)}: {connection.RemotePort}");
+
 			if (IsLocalHost(request))
 			{
+				_Logger.Verbose("Request passed based on localhost.");
 				return true;
 			}
 
-			var connection = request.HttpContext.Connection;
 			if (connection.LocalIpAddress != null)
 			{
 				// TODO: LocalIpAddress is only set when the request comes from within the network.. right?
