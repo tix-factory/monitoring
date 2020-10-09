@@ -28,6 +28,8 @@ services:
   logging-service:
     image: tixfactory/monitoring:latest
     container_name: logging-service
+    environment:
+      LoggingServiceAllowedIpAddressesCsv: 127.0.0.1 # ME: Replace this IP address with public facing IP address! 
     networks:
       tix-factory:
         aliases:
