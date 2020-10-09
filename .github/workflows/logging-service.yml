@@ -20,13 +20,8 @@ jobs:
       run: dotnet restore ./Services/Logging/TixFactory.Logging.Service.sln
     - name: Build + Publish
       run: dotnet publish ./Services/Logging/TixFactory.Logging.Service/TixFactory.Logging.Service.csproj --output ./Build/Publish/Application --configuration Release --runtime linux-x64 --self-contained true
-    - name: Create Artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: artifact
-        path: ./Build/Publish
     - name: Create Docker Image
-      run: docker build --tag tix-factory/monitoring:latest .
+      run: docker build --tag tix-factory/monitoring:latest ./Build/Publish
     - name: Login to DockerHub
       # if: ${{ github.ref == 'refs/heads/main' }}
       uses: docker/login-action@v1
