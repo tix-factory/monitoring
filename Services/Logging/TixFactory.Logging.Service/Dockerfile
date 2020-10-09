@@ -4,7 +4,7 @@ FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
 COPY ./Application /Applicaiton
 
 # Set working directory for the ENTRYPOINT
-WORKDIR Application
+#WORKDIR Application
 
 # Run the application
 ENTRYPOINT ["dir"]
