@@ -7,5 +7,5 @@ COPY ./Application /Applicaiton
 #WORKDIR Application
 
 # Run the application
-ENTRYPOINT ["dir"]
+ENTRYPOINT ["dir", "Application"]
 #ENTRYPOINT ["dotnet", "TixFactory.Logging.Service.dll"]
