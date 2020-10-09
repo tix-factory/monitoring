@@ -20,6 +20,9 @@ jobs:
       run: dotnet restore ./Services/Logging/TixFactory.Logging.Service.sln
     - name: Build + Publish
       run: dotnet publish ./Services/Logging/TixFactory.Logging.Service/TixFactory.Logging.Service.csproj --output ./Build/Publish/Application --configuration Release --runtime linux-x64 --self-contained true
+    - name: Verify Publish
+      working-directory: ./Build/Publish/Application
+      run: dir
     - name: Create Docker Image
       run: docker build --tag tixfactory/monitoring:latest ./Build/Publish
     - name: Login to DockerHub
