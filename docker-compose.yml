@@ -14,6 +14,10 @@ services:
         aliases:
           - elasticsearch
           - tix-factory-monitoring
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: always
   kibana:
     image: docker.elastic.co/kibana/kibana:7.9.2
@@ -22,6 +26,10 @@ services:
       tix-factory:
         aliases:
           - kibana
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
     ports:
       - "5601:5601"
     restart: always
@@ -34,6 +42,10 @@ services:
       tix-factory:
         aliases:
           - logging-service
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
     ports:
       - "80:80"
     restart: always
