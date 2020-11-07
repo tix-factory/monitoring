@@ -4,9 +4,9 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.9.2
     container_name: elasticsearch
     environment:
-      discovery.seed_hosts: 127.0.0.1
-      discovery.type: single-node
-      bootstrap.memory_lock: true
+      - discovery.seed_hosts=127.0.0.1
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -43,13 +43,13 @@ services:
     image: tixfactory/logging-service:latest
     container_name: logging-service
     environment:
-      LoggingServiceAllowedIpAddressesCsv: 127.0.0.1 # ME: Replace this IP address with public facing IP address!
-      ElasticSearchEndpoint: http://es.tixfactory.systems:9200/tix-factory/logs
+      - LoggingServiceAllowedIpAddressesCsv=127.0.0.1 # ME: Replace this IP address with public facing IP address!
+      - ElasticSearchEndpoint=http://es.tixfactory.systems:9200/tix-factory/logs
     networks:
       tix-factory:
         aliases:
           - logging-service
-          - monitoring.tixfactory.systems
+          - logging.services.tixfactory.systems
     logging:
       options:
         max-size: "10m"
