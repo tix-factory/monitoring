@@ -12,14 +12,15 @@ namespace TixFactory.Logging.Service
 {
 	internal class ElasticLogger : IElasticLogger
 	{
-		private const string _UrlBase = "http://tix-factory-monitoring:9200/tix-factory/logs";
 		private readonly IHttpClient _HttpClient;
 		private readonly IApplicationContext _ApplicationContext;
+		private readonly string _UrlBase;
 
 		public ElasticLogger(IHttpClient httpClient, IApplicationContext applicationContext)
 		{
 			_HttpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
 			_ApplicationContext = applicationContext ?? throw new ArgumentNullException(nameof(applicationContext));
+			_UrlBase = Environment.GetEnvironmentVariable("ElasticSearchEndpoint");
 		}
 
 		public void Log(LogRequest logRequest)
