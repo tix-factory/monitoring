@@ -16,15 +16,14 @@ Without this elasticsearch won't start. Updating the file makes sure it persists
 See: https://stackoverflow.com/a/51448773/1663648
 
 #### Firewall
-This doc assumes ME is using digitalocean. Set up a firewall in digitalocean to allow port `80` from anywhere, and `5601` + `9200` from ME IP address.
+This doc assumes ME is using digitalocean. Set up a firewall in digitalocean to allow port `80`, `5601` + `9200` from allowed IP addresses (including ME IP address).
 
 ### Install
-Copy the `docker-compose.yml` file into the VPS and then run it by running: `docker-compose up -d`
-Run the command in the directory that contains the `docker-compose.yml`. 
+Copy the following files into the same directory on the VPS:
+- `kibana.yml`
+- `docker-compose.yml`
 
-### Kibana Configuration
-#### Dark Theme
-Kibana has a dark theme! In the navigation go to `Stack Management` -> `Advanced Settings` and search for "theme".
+Run `docker-compose up -d` in that directory.
 
 #### Logs
 Add the index pattern in `Stack Management` -> `Index Patterns`.
