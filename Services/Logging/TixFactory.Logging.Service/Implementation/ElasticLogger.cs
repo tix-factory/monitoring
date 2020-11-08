@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Net.Http;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
 using TixFactory.ApplicationContext;
 using TixFactory.Http;
 using TixFactory.Http.Client;
@@ -22,7 +24,7 @@ namespace TixFactory.Logging.Service
 			_UrlBase = Environment.GetEnvironmentVariable("ElasticSearchEndpoint");
 		}
 
-		public void Log(LogRequest logRequest)
+		public async Task LogAsync(LogRequest logRequest, CancellationToken cancellationToken)
 		{
 			if (logRequest == null)
 			{
@@ -48,14 +50,14 @@ namespace TixFactory.Logging.Service
 			httpRequest.Body = new StringContent(json);
 			httpRequest.Headers.AddOrUpdate("Content-Type", "application/json");
 
-			var httpResponse = _HttpClient.Send(httpRequest);
+			var httpResponse = await _HttpClient.SendAsync(httpRequest, cancellationToken).ConfigureAwait(false);
 			if (!httpResponse.IsSuccessful)
 			{
-				throw new ApplicationException($"Failed to log to elasticsearch ({httpResponse.StatusCode})\n{httpResponse.GetStringBody()}");
+				throw new HttpException(httpRequest, httpResponse);
 			}
 		}
 
-		public void Purge(DateTime clearBefore)
+		public async Task PurgeAsync(DateTime clearBefore, CancellationToken cancellationToken)
 		{
 			var searchRequestBody = new QueryRequest<RangeRequest<DateBeforeRequest>>
 			{
@@ -76,7 +78,7 @@ namespace TixFactory.Logging.Service
 			httpRequest.Body = new StringContent(json);
 			httpRequest.Headers.AddOrUpdate("Content-Type", "application/json");
 
-			var httpResponse = _HttpClient.Send(httpRequest);
+			var httpResponse = await _HttpClient.SendAsync(httpRequest, cancellationToken).ConfigureAwait(false);
 			if (!httpResponse.IsSuccessful)
 			{
 				throw new ApplicationException($"Failed to send search query to elasticsearch ({httpResponse.StatusCode})\n{httpResponse.GetStringBody()}");
@@ -87,12 +89,12 @@ namespace TixFactory.Logging.Service
 
 			foreach (var log in searchResults.Data.Data)
 			{
-				var deleteResponse = Delete(log.Id);
+				var deleteResponse = await DeleteAsync(log.Id, cancellationToken).ConfigureAwait(false);
 				if (!deleteResponse.IsSuccessful)
 				{
-					Log(new LogRequest
+					await LogAsync(new LogRequest
 					{
-						Message = $"{nameof(ElasticLogger)}.{nameof(Delete)}({log.Id})\n\tUrl: {deleteResponse.Url}\n\tStatus Code: {deleteResponse.StatusCode}\n{deleteResponse.GetStringBody()}",
+						Message = $"{nameof(ElasticLogger)}.{nameof(DeleteAsync)}({log.Id})\n\tUrl: {deleteResponse.Url}\n\tStatus Code: {deleteResponse.StatusCode}\n{deleteResponse.GetStringBody()}",
 						Host = new HostData
 						{
 							Name = Environment.MachineName
@@ -102,15 +104,15 @@ namespace TixFactory.Logging.Service
 							Name = _ApplicationContext.Name,
 							Level = LogLevel.Warning
 						}
-					});
+					}, cancellationToken).ConfigureAwait(false);
 				}
 			}
 		}
 
-		private IHttpResponse Delete(string id)
+		private Task<IHttpResponse> DeleteAsync(string id, CancellationToken cancellationToken)
 		{
 			var httpRequest = new HttpRequest(HttpMethod.Delete, new Uri($"{_UrlBase}/{id}"));
-			return _HttpClient.Send(httpRequest);
+			return _HttpClient.SendAsync(httpRequest, cancellationToken);
 		}
 	}
 }

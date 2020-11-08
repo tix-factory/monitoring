@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace TixFactory.Logging.Service
 {
 	public interface IElasticLogger
 	{
-		void Log(LogRequest logRequest);
+		Task LogAsync(LogRequest logRequest, CancellationToken cancellationToken);
 
-		void Purge(DateTime clearBefore);
+		Task PurgeAsync(DateTime clearBefore, CancellationToken cancellationToken);
 	}
 }

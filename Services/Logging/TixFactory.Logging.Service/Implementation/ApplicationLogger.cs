@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using TixFactory.ApplicationContext;
 
 namespace TixFactory.Logging.Service
@@ -43,7 +44,7 @@ namespace TixFactory.Logging.Service
 		{
 			try
 			{
-				_ElasticLogger.Log(new LogRequest
+				var logTask = _ElasticLogger.LogAsync(new LogRequest
 				{
 					Message = message,
 					Host = new HostData
@@ -55,7 +56,9 @@ namespace TixFactory.Logging.Service
 						Name = _ApplicationContext.Name,
 						Level = logLevel
 					}
-				});
+				}, CancellationToken.None);
+
+				logTask.Wait();
 			}
 			catch(Exception e)
 			{
