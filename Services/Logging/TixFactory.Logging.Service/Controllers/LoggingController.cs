@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 namespace TixFactory.Logging.Service.Controllers
@@ -14,20 +16,22 @@ namespace TixFactory.Logging.Service.Controllers
 		}
 
 		[HttpPost]
-		public void Log([FromBody] LogRequest request)
+		public async Task<IActionResult> LogAsync([FromBody] LogRequest request, CancellationToken cancellationToken)
 		{
-			_ElasticLogger.Log(request);
+			await _ElasticLogger.LogAsync(request, cancellationToken).ConfigureAwait(false);
+			return new NoContentResult();
 		}
 
 		[HttpDelete]
-		public void Purge(int months)
+		public async Task<IActionResult> Purge(int months, CancellationToken cancellationToken)
 		{
 			if (months < 1)
 			{
 				throw new ArgumentException($"{nameof(months)} must be at least 1.", nameof(months));
 			}
 
-			_ElasticLogger.Purge(DateTime.UtcNow - TimeSpan.FromDays(30 * months));
+			await _ElasticLogger.PurgeAsync(DateTime.UtcNow - TimeSpan.FromDays(30 * months), cancellationToken).ConfigureAwait(false);
+			return new NoContentResult();
 		}
 	}
 }
