@@ -24,10 +24,25 @@ namespace TixFactory.Logging.Service.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> BatchLog([FromBody] LogRequest[] request, CancellationToken cancellationToken)
+		public async Task<BatchLogResult> BatchLog([FromBody] LogRequest[] requests, CancellationToken cancellationToken)
 		{
-			await Task.WhenAll(request.Select(r => _ElasticLogger.LogAsync(r, cancellationToken))).ConfigureAwait(false);
-			return new NoContentResult();
+			var logTasks = requests.Where(r => !string.IsNullOrWhiteSpace(r?.Id)).ToDictionary(r => r.Id, r => _ElasticLogger.LogAsync(r, cancellationToken));
+
+			try
+			{
+				await Task.WhenAll(logTasks.Values).ConfigureAwait(false);
+			}
+			catch
+			{
+				// rip
+				// maybe we should log this at some point
+			}
+
+			return new BatchLogResult
+			{
+				SuccessfulLogIds = logTasks.Where(t => t.Value.IsCompletedSuccessfully).Select(t => t.Key).ToArray(),
+				FailedLogIds = logTasks.Where(t => !t.Value.IsCompletedSuccessfully).Select(t => t.Key).ToArray()
+			};
 		}
 
 		[HttpDelete]
