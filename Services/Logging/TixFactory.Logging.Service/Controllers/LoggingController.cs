@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using TixFactory.Http.Service;
 
 namespace TixFactory.Logging.Service.Controllers
 {
@@ -46,15 +47,15 @@ namespace TixFactory.Logging.Service.Controllers
 		}
 
 		[HttpDelete]
-		public async Task<IActionResult> Purge(int months, CancellationToken cancellationToken)
+		public async Task<Payload<int>> Purge(int months, CancellationToken cancellationToken)
 		{
 			if (months < 1)
 			{
 				throw new ArgumentException($"{nameof(months)} must be at least 1.", nameof(months));
 			}
 
-			await _ElasticLogger.PurgeAsync(DateTime.UtcNow - TimeSpan.FromDays(30 * months), cancellationToken).ConfigureAwait(false);
-			return new NoContentResult();
+			var count = await _ElasticLogger.PurgeAsync(DateTime.UtcNow - TimeSpan.FromDays(30 * months), cancellationToken).ConfigureAwait(false);
+			return new Payload<int>(count, null);
 		}
 	}
 }
