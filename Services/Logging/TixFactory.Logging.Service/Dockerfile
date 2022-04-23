@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1
+FROM mcr.microsoft.com/dotnet/core/aspnet:6.0
 
 # Copies the contents of the directory the Dockerfile is in into the image.
 COPY ./Application /Application

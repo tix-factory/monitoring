@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
@@ -57,7 +58,7 @@ namespace TixFactory.Logging.Service
 			}
 		}
 
-		public async Task PurgeAsync(DateTime clearBefore, CancellationToken cancellationToken)
+		public async Task<int> PurgeAsync(DateTime clearBefore, CancellationToken cancellationToken)
 		{
 			var searchRequestBody = new QueryRequest<RangeRequest<DateBeforeRequest>>
 			{
@@ -73,7 +74,7 @@ namespace TixFactory.Logging.Service
 				}
 			};
 
-			var httpRequest = new HttpRequest(HttpMethod.Post, new Uri($"{_UrlBase}/_search"));
+			var httpRequest = new HttpRequest(HttpMethod.Post, new Uri($"{_UrlBase}/_search?size=1000"));
 			var json = JsonSerializer.Serialize(searchRequestBody);
 			httpRequest.Body = new StringContent(json);
 			httpRequest.Headers.AddOrUpdate("Content-Type", "application/json");
@@ -87,32 +88,32 @@ namespace TixFactory.Logging.Service
 			var responseJson = httpResponse.GetStringBody();
 			var searchResults = JsonSerializer.Deserialize<SearchResponse>(responseJson);
 
-			foreach (var log in searchResults.Data.Data)
-			{
-				var deleteResponse = await DeleteAsync(log.Id, cancellationToken).ConfigureAwait(false);
-				if (!deleteResponse.IsSuccessful)
-				{
-					await LogAsync(new LogRequest
-					{
-						Message = $"{nameof(ElasticLogger)}.{nameof(DeleteAsync)}({log.Id})\n\tUrl: {deleteResponse.Url}\n\tStatus Code: {deleteResponse.StatusCode}\n{deleteResponse.GetStringBody()}",
-						Host = new HostData
-						{
-							Name = Environment.MachineName
-						},
-						Log = new LogData
-						{
-							Name = _ApplicationContext.Name,
-							Level = LogLevel.Warning
-						}
-					}, cancellationToken).ConfigureAwait(false);
-				}
-			}
-		}
+			var deleteTasks = searchResults.Data.Data.Select(log => DeleteLogAsync(log.Id, cancellationToken)).ToArray();
+			await Task.WhenAll(deleteTasks);
 
-		private Task<IHttpResponse> DeleteAsync(string id, CancellationToken cancellationToken)
+			return deleteTasks.Length;
+		}
+		
+		private async Task DeleteLogAsync(string id, CancellationToken cancellationToken)
 		{
 			var httpRequest = new HttpRequest(HttpMethod.Delete, new Uri($"{_UrlBase}/{id}"));
-			return _HttpClient.SendAsync(httpRequest, cancellationToken);
+			var deleteResponse = await _HttpClient.SendAsync(httpRequest, cancellationToken);
+			if (!deleteResponse.IsSuccessful)
+			{
+				await LogAsync(new LogRequest
+				{
+					Message = $"{nameof(ElasticLogger)}.{nameof(DeleteLogAsync)}({id})\n\tUrl: {deleteResponse.Url}\n\tStatus Code: {deleteResponse.StatusCode}\n{deleteResponse.GetStringBody()}",
+					Host = new HostData
+					{
+						Name = Environment.MachineName
+					},
+					Log = new LogData
+					{
+						Name = _ApplicationContext.Name,
+						Level = LogLevel.Warning
+					}
+				}, cancellationToken).ConfigureAwait(false);
+			}
 		}
 	}
 }

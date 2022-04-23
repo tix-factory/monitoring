@@ -8,6 +8,6 @@ namespace TixFactory.Logging.Service
 	{
 		Task LogAsync(LogRequest logRequest, CancellationToken cancellationToken);
 
-		Task PurgeAsync(DateTime clearBefore, CancellationToken cancellationToken);
+		Task<int> PurgeAsync(DateTime clearBefore, CancellationToken cancellationToken);
 	}
 }
