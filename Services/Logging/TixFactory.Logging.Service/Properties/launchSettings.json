@@ -14,7 +14,7 @@
       "applicationUrl": "http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "ElasticSearchEndpoint": "http://es.tixfactory.systems:9200/tix-factory/logs" 
+        "ElasticSearchEndpoint": "http://es.tixfactory.systems:9200/tix-factory" 
       }
     }
   }

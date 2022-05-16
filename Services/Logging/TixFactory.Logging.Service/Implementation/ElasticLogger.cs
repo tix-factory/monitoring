@@ -46,7 +46,7 @@ namespace TixFactory.Logging.Service
 				}
 			};
 
-			var httpRequest = new HttpRequest(HttpMethod.Put, new Uri($"{_UrlBase}/{Guid.NewGuid()}"));
+			var httpRequest = new HttpRequest(HttpMethod.Put, new Uri($"{_UrlBase}/_doc/{Guid.NewGuid()}"));
 			var json = JsonSerializer.Serialize(log);
 			httpRequest.Body = new StringContent(json);
 			httpRequest.Headers.AddOrUpdate("Content-Type", "application/json");
